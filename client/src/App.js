@@ -1,47 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
-function MyForm() {
-  const [formData, setFormData] = useState({ name: '', email: '' });
+import axios from 'axios';
 
-  const [todos, setTodos] = useState([]);
+export default function Hello() {
+  const [formData, setFormData] = useState({ name: '', email: '' });
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    const fetchTodos = async () => {
-      try {
-        const response = await fetch('http://localhost:3001/api/data');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setTodos(data);
-      } catch (error) {
-        console.error('There has been a problem with your fetch operation:', error);
-      }
-    };
-
-    fetchTodos();
+    axios
+      .get('http://localhost:3001/api/data')
+      .then((todo) => setData(todo.data));
   }, []);
-
-  const handleAddTodo = async (title) => {
-    try {
-      const response = await fetch('http://localhost:3001/api/todos', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-
-      const newTodo = await response.json();
-      setTodos([...todos, newTodo]); 
-    } catch (error) {
-      console.error('There has been a problem with your fetch operation:', error);
-    }
-  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -72,13 +41,13 @@ function MyForm() {
   };
 
   return (
-    <><h1>Todo List</h1>
-    <ul>
-      {todos.map((todo) => (
-        <li key={todo.id}>{todo.title}</li>
+    <div>
+      <h1>Get API Call</h1>
+      {data.map((property) => (
+        <div key={property.id}>{property.title}</div>
       ))}
-    </ul>
-    <form onSubmit={handleSubmit}>
+       <h1>Post API Call</h1>
+       <form onSubmit={handleSubmit}>
       <div>
         <label htmlFor="name">Name:</label>
         <input
@@ -101,8 +70,6 @@ function MyForm() {
       </div>
       <button type="submit">Submit</button>
     </form>
-    </>
+    </div>
   );
 }
-
-export default MyForm;
